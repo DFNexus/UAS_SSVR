@@ -1,7 +1,7 @@
 # Progress Checklist
 
 - [x] FASE 0 - Inisialisasi Repo dan Docker Skeleton
-- [ ] FASE 1 - Model Inti dan Database
+- [x] FASE 1 - Model Inti dan Database
 - [ ] FASE 2 - Autentikasi JWT dan RBAC
 - [ ] FASE 3 - Endpoint Inti Course, Lesson, Enrollment, Progress
 - [ ] FASE 4 - Fitur Tambahan 1: Search, Filter, Sorting Lanjutan
