@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'apps.progress',
     'apps.reviews',
     'apps.wishlist',
+    'apps.dashboard',
     'seed',
 ]
 

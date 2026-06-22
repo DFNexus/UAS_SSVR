@@ -9,6 +9,7 @@ from apps.enrollments.api import router as enrollments_router
 from apps.progress.api import router as progress_router
 from apps.wishlist.api import router as wishlist_router
 from apps.reviews.api import router as reviews_router
+from apps.dashboard.api import router as dashboard_router
 
 api = NinjaAPI(title="Simple LMS API")
 
@@ -21,6 +22,7 @@ api.add_router("/", enrollments_router)
 api.add_router("/", progress_router)
 api.add_router("/wishlist/", wishlist_router)
 api.add_router("/", reviews_router)
+api.add_router("/dashboard/", dashboard_router)
 
 @api.get("/")
 def welcome(request):
