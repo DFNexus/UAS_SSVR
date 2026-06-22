@@ -28,3 +28,21 @@ class StudentAuth(JWTAuth):
         if not user or user.role not in ['admin', 'instructor', 'student']:
             raise HttpError(403, "Student permission required.")
         return user
+
+from django.contrib.auth.models import AnonymousUser
+
+class OptionalJWTAuth(JWTAuth):
+    def __call__(self, request):
+        try:
+            user = super().__call__(request)
+            if user:
+                return user
+        except Exception:
+            pass
+        return AnonymousUser()
+    
+    def authenticate(self, request, token):
+        try:
+            return super().authenticate(request, token)
+        except Exception:
+            return AnonymousUser()

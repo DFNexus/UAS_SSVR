@@ -1,10 +1,18 @@
-from ninja import Schema, ModelSchema
+from ninja import Schema, ModelSchema, FilterSchema
 from typing import List, Optional
 from datetime import datetime
 
 from apps.categories.schemas import CategorySchema
 from apps.users.schemas import UserSchema
 from .models import Course, Section, Lesson
+
+class CourseFilterSchema(FilterSchema):
+    search: Optional[str] = None
+    category: Optional[str] = None
+    instructor: Optional[int] = None
+    level: Optional[str] = None
+    status: Optional[str] = None
+    ordering: Optional[str] = None
 
 class LessonSchema(ModelSchema):
     class Meta:

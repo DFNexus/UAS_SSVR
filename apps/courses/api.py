@@ -1,17 +1,18 @@
-from ninja import Router
+from ninja import Router, Query
 from typing import List
 from django.shortcuts import get_object_or_404
 from ninja.errors import HttpError
 from django.utils.text import slugify
+from django.db.models import Q, Count
 
 from .models import Course, Section, Lesson
 from apps.categories.models import Category
 from .schemas import (
     CourseSchema, CourseDetailSchema, CourseCreateSchema, CourseUpdateSchema,
     SectionSchema, SectionCreateSchema,
-    LessonSchema, LessonCreateSchema
+    LessonSchema, LessonCreateSchema, CourseFilterSchema
 )
-from apps.users.auth import InstructorAuth
+from apps.users.auth import InstructorAuth, OptionalJWTAuth
 
 course_router = Router(tags=["Courses"])
 section_router = Router(tags=["Sections"])
@@ -19,9 +20,55 @@ lesson_router = Router(tags=["Lessons"])
 
 # --- COURSES ---
 
-@course_router.get("/", response=List[CourseSchema])
-def list_courses(request):
-    return Course.objects.filter(status='published').select_related('category', 'instructor')
+@course_router.get("/", response=List[CourseSchema], auth=OptionalJWTAuth())
+def list_courses(request, filters: CourseFilterSchema = Query(...)):
+    user = getattr(request, 'user', None)
+    
+    # 1. Base Queryset (Visibility)
+    if user and user.is_authenticated:
+        if user.role == 'admin':
+            qs = Course.objects.all()
+        elif user.role == 'instructor':
+            qs = Course.objects.filter(Q(status='published') | Q(instructor=user))
+        else:
+            qs = Course.objects.filter(status='published')
+    else:
+        qs = Course.objects.filter(status='published')
+        
+    qs = qs.select_related('category', 'instructor')
+    
+    # 2. Filters
+    if filters.search:
+        qs = qs.filter(Q(title__icontains=filters.search) | Q(description__icontains=filters.search))
+    
+    if filters.category:
+        if filters.category.isdigit():
+            qs = qs.filter(category_id=int(filters.category))
+        else:
+            qs = qs.filter(category__slug=filters.category)
+            
+    if filters.instructor:
+        qs = qs.filter(instructor_id=filters.instructor)
+        
+    if filters.level:
+        qs = qs.filter(level=filters.level)
+        
+    if filters.status:
+        qs = qs.filter(status=filters.status)
+        
+    # 3. Ordering
+    if filters.ordering == 'newest':
+        qs = qs.order_by('-created_at')
+    elif filters.ordering == 'oldest':
+        qs = qs.order_by('created_at')
+    elif filters.ordering == 'title':
+        qs = qs.order_by('title')
+    elif filters.ordering == 'popular':
+        qs = qs.annotate(enrollments_count=Count('enrollments')).order_by('-enrollments_count')
+    else:
+        qs = qs.order_by('-created_at') # default
+        
+    return qs
 
 @course_router.get("/{course_id}", response=CourseDetailSchema)
 def get_course_detail(request, course_id: int):
