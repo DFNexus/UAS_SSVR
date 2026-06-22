@@ -105,3 +105,15 @@ class CourseSearchFilterTests(TestCase):
         self.assertEqual(data[0]['id'], self.c2.id) # Advanced Django
         self.assertEqual(data[1]['id'], self.c3.id) # Data Science 101
         self.assertEqual(data[2]['id'], self.c1.id) # Python Basics
+
+    def test_combination_filters(self):
+        # search + level
+        res = self.client.get("/courses/?search=python&level=beginner")
+        data = res.json()
+        self.assertEqual(len(data), 2)  # c1 (Python Basics) + c3 (Data science with python)
+
+        # search + category
+        res = self.client.get("/courses/?search=python&category=web-dev")
+        data = res.json()
+        self.assertEqual(len(data), 1)  # c1 only (web-dev category)
+        self.assertEqual(data[0]['id'], self.c1.id)

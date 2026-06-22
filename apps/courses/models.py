@@ -29,7 +29,7 @@ class Course(models.Model):
 class Section(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sections')
     title = models.CharField(max_length=200)
-    order = models.IntegerField(default=0)
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['order']
@@ -41,7 +41,7 @@ class Lesson(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=200)
     content = models.TextField()
-    order = models.IntegerField(default=0)
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['order']

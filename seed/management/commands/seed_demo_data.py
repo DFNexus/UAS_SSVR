@@ -20,8 +20,8 @@ class Command(BaseCommand):
 
         # Users
         User.objects.create_superuser('admin', 'admin@example.com', 'admin123', role='admin')
-        instructor1 = User.objects.create_user('inst1', 'inst1@example.com', 'inst123', role='instructor')
-        instructor2 = User.objects.create_user('inst2', 'inst2@example.com', 'inst123', role='instructor')
+        instructor1 = User.objects.create_user('instructor1', 'instructor1@example.com', 'instructor123', role='instructor')
+        instructor2 = User.objects.create_user('instructor2', 'instructor2@example.com', 'instructor123', role='instructor')
         student1 = User.objects.create_user('student1', 'student1@example.com', 'student123', role='student')
         student2 = User.objects.create_user('student2', 'student2@example.com', 'student123', role='student')
         student3 = User.objects.create_user('student3', 'student3@example.com', 'student123', role='student')
