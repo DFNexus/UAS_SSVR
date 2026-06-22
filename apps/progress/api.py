@@ -34,6 +34,8 @@ def complete_lesson(request, lesson_id: int):
         
     return 200, progress
 
+from .services import ProgressService
+
 @router.get("/courses/{course_id}/progress", response=CourseProgressDetailSchema, auth=StudentAuth())
 def course_progress(request, course_id: int):
     course = get_object_or_404(Course, id=course_id)
@@ -42,16 +44,4 @@ def course_progress(request, course_id: int):
     if not enrollment:
         raise HttpError(403, "You are not enrolled in this course.")
         
-    total_lessons = Lesson.objects.filter(section__course=course).count()
-    completed_lessons = Progress.objects.filter(enrollment=enrollment, completed=True).count()
-    
-    percentage = 0.0
-    if total_lessons > 0:
-        percentage = round((completed_lessons / total_lessons) * 100, 2)
-        
-    return {
-        "course_id": course.id,
-        "total_lessons": total_lessons,
-        "completed_lessons": completed_lessons,
-        "progress_percentage": percentage
-    }
+    return ProgressService.calculate_course_progress(enrollment)

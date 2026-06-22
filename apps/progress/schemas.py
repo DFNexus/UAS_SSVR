@@ -11,8 +11,16 @@ class ProgressSchema(ModelSchema):
         model = Progress
         fields = ['id', 'completed', 'completed_at']
 
+class SectionProgressSchema(Schema):
+    section_id: int
+    title: str
+    total_lessons: int
+    completed_lessons: int
+    progress_percentage: float
+
 class CourseProgressDetailSchema(Schema):
     course_id: int
     total_lessons: int
     completed_lessons: int
     progress_percentage: float
+    sections: List[SectionProgressSchema] = []
