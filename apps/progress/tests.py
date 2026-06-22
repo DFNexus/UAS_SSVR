@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from apps.courses.models import Course, Section, Lesson
 from apps.enrollments.models import Enrollment
 from apps.progress.models import Progress
-from apps.progress.services import ProgressService
+from apps.progress.services import calculate_progress
 from apps.categories.models import Category
 
 User = get_user_model()
@@ -30,30 +30,24 @@ class ProgressServiceTests(TestCase):
         self.enrollment = Enrollment.objects.create(student=self.student, course=self.course)
 
     def test_progress_zero(self):
-        res = ProgressService.calculate_course_progress(self.enrollment)
-        self.assertEqual(res['total_lessons'], 4)
-        self.assertEqual(res['completed_lessons'], 0)
-        self.assertEqual(res['progress_percentage'], 0.0)
-        self.assertEqual(len(res['sections']), 2)
-        self.assertEqual(res['sections'][0]['progress_percentage'], 0.0)
+        res = calculate_progress(self.enrollment)
+        self.assertEqual(res['course_progress'], 0.0)
+        self.assertEqual(res['section_progress'][self.sec1.id], 0.0)
+        self.assertEqual(res['section_progress'][self.sec2.id], 0.0)
+        self.assertFalse(res['lesson_progress'][self.s1l1.id])
 
     def test_progress_partial(self):
         Progress.objects.create(enrollment=self.enrollment, lesson=self.s1l1, completed=True)
         Progress.objects.create(enrollment=self.enrollment, lesson=self.s1l2, completed=True)
         Progress.objects.create(enrollment=self.enrollment, lesson=self.s2l1, completed=True)
         
-        res = ProgressService.calculate_course_progress(self.enrollment)
+        res = calculate_progress(self.enrollment)
         
-        self.assertEqual(res['completed_lessons'], 3)
-        self.assertEqual(res['progress_percentage'], 75.0)
-        
-        # Sec 1 is 100%
-        sec1_prog = next(s for s in res['sections'] if s['section_id'] == self.sec1.id)
-        self.assertEqual(sec1_prog['progress_percentage'], 100.0)
-        
-        # Sec 2 is 50%
-        sec2_prog = next(s for s in res['sections'] if s['section_id'] == self.sec2.id)
-        self.assertEqual(sec2_prog['progress_percentage'], 50.0)
+        self.assertEqual(res['course_progress'], 75.0)
+        self.assertEqual(res['section_progress'][self.sec1.id], 100.0)
+        self.assertEqual(res['section_progress'][self.sec2.id], 50.0)
+        self.assertTrue(res['lesson_progress'][self.s1l1.id])
+        self.assertFalse(res['lesson_progress'][self.s2l2.id])
 
     def test_progress_complete(self):
         Progress.objects.create(enrollment=self.enrollment, lesson=self.s1l1, completed=True)
@@ -61,6 +55,6 @@ class ProgressServiceTests(TestCase):
         Progress.objects.create(enrollment=self.enrollment, lesson=self.s2l1, completed=True)
         Progress.objects.create(enrollment=self.enrollment, lesson=self.s2l2, completed=True)
         
-        res = ProgressService.calculate_course_progress(self.enrollment)
-        self.assertEqual(res['completed_lessons'], 4)
-        self.assertEqual(res['progress_percentage'], 100.0)
+        res = calculate_progress(self.enrollment)
+        self.assertEqual(res['course_progress'], 100.0)
+        self.assertEqual(res['section_progress'][self.sec2.id], 100.0)

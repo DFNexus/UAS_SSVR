@@ -11,16 +11,9 @@ class ProgressSchema(ModelSchema):
         model = Progress
         fields = ['id', 'completed', 'completed_at']
 
-class SectionProgressSchema(Schema):
-    section_id: int
-    title: str
-    total_lessons: int
-    completed_lessons: int
-    progress_percentage: float
+from typing import Dict
 
-class CourseProgressDetailSchema(Schema):
-    course_id: int
-    total_lessons: int
-    completed_lessons: int
-    progress_percentage: float
-    sections: List[SectionProgressSchema] = []
+class ProgressDetailSchema(Schema):
+    lesson_progress: Dict[int, bool]
+    section_progress: Dict[int, float]
+    course_progress: float

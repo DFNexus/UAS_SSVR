@@ -6,7 +6,8 @@ from django.utils import timezone
 from .models import Progress
 from apps.courses.models import Lesson, Course
 from apps.enrollments.models import Enrollment
-from .schemas import ProgressSchema, CourseProgressDetailSchema
+from .schemas import ProgressSchema, ProgressDetailSchema
+from .services import calculate_progress
 from apps.users.auth import StudentAuth
 
 router = Router(tags=["Progress"])
@@ -14,13 +15,10 @@ router = Router(tags=["Progress"])
 @router.post("/lessons/{lesson_id}/complete", response={200: ProgressSchema}, auth=StudentAuth())
 def complete_lesson(request, lesson_id: int):
     lesson = get_object_or_404(Lesson, id=lesson_id)
-    course = lesson.section.course
     
-    # Check enrollment
-    enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
-    if not enrollment:
-        raise HttpError(403, "You must be enrolled in the course to complete its lessons.")
-        
+    # Must be enrolled
+    enrollment = get_object_or_404(Enrollment, student=request.user, course=lesson.section.course)
+    
     progress, created = Progress.objects.get_or_create(
         enrollment=enrollment,
         lesson=lesson,
@@ -34,14 +32,9 @@ def complete_lesson(request, lesson_id: int):
         
     return 200, progress
 
-from .services import ProgressService
-
-@router.get("/courses/{course_id}/progress", response=CourseProgressDetailSchema, auth=StudentAuth())
-def course_progress(request, course_id: int):
+@router.get("/courses/{course_id}/progress", response=ProgressDetailSchema, auth=StudentAuth())
+def get_course_progress(request, course_id: int):
     course = get_object_or_404(Course, id=course_id)
-    enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+    enrollment = get_object_or_404(Enrollment, student=request.user, course=course)
     
-    if not enrollment:
-        raise HttpError(403, "You are not enrolled in this course.")
-        
-    return ProgressService.calculate_course_progress(enrollment)
+    return calculate_progress(enrollment)
