@@ -1,6 +1,5 @@
 from ninja import Schema, ModelSchema, FilterSchema
 from typing import List, Optional
-from datetime import datetime
 
 from apps.categories.schemas import CategorySchema
 from apps.users.schemas import UserSchema

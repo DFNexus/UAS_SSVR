@@ -23,7 +23,8 @@ def register(request, payload: RegisterSchema):
         password=payload.password,
         role='student'  # default role
     )
-    return 201, user
+    from ninja.responses import Status
+    return Status(201, user)
 
 @router.post("/login", response=TokenSchema)
 def login(request, payload: LoginSchema):

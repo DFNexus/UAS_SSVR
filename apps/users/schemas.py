@@ -1,6 +1,5 @@
 from ninja import Schema
 from pydantic import model_validator
-from typing import Optional
 
 class UserSchema(Schema):
     id: int

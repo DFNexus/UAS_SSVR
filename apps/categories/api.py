@@ -23,4 +23,5 @@ def create_category(request, payload: CategoryCreateSchema):
         name=payload.name,
         slug=slug
     )
-    return 201, category
+    from ninja.responses import Status
+    return Status(201, category)

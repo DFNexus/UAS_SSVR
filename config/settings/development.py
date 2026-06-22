@@ -1,6 +1,6 @@
-from .base import *
+from .base import *  # noqa: F403
 
-DEBUG = env('DEBUG', default=True)
+DEBUG = env('DEBUG', default=True)  # noqa: F405
 
 ALLOWED_HOSTS = ['*']
 

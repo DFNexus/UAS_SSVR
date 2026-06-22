@@ -1,4 +1,3 @@
-from apps.courses.models import Course, Section, Lesson
 from apps.enrollments.models import Enrollment
 from .models import Progress
 

@@ -4,6 +4,8 @@ from .models import Wishlist
 from .schemas import WishlistSchema, WishlistCreateSchema
 from apps.courses.models import Course
 from apps.users.auth import StudentAuth
+from ninja.responses import Status
+from ninja.errors import HttpError
 
 router = Router(tags=["Wishlist"])
 
@@ -11,20 +13,20 @@ router = Router(tags=["Wishlist"])
 def add_to_wishlist(request, data: WishlistCreateSchema):
     course = get_object_or_404(Course, id=data.course_id)
     if Wishlist.objects.filter(student=request.user, course=course).exists():
-        return 400, {"detail": "Course already in wishlist"}
+        raise HttpError(400, "Course already in wishlist")
     
     wishlist = Wishlist.objects.create(student=request.user, course=course)
-    return 201, wishlist
+    return Status(201, wishlist)
 
 @router.delete("/{course_id}", response={204: None, 404: dict}, auth=StudentAuth())
 def remove_from_wishlist(request, course_id: int):
     course = get_object_or_404(Course, id=course_id)
     wishlist = Wishlist.objects.filter(student=request.user, course=course).first()
     if not wishlist:
-        return 404, {"detail": "Course not in wishlist"}
+        raise HttpError(404, "Course not in wishlist")
     
     wishlist.delete()
-    return 204, None
+    return Status(204, None)
 
 @router.get("/", response=list[WishlistSchema], auth=StudentAuth())
 def list_wishlist(request):

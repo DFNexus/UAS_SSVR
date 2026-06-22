@@ -19,7 +19,7 @@ class Command(BaseCommand):
         self.stdout.write('Seeding demo data...')
 
         # Users
-        admin = User.objects.create_superuser('admin', 'admin@example.com', 'admin123', role='admin')
+        User.objects.create_superuser('admin', 'admin@example.com', 'admin123', role='admin')
         instructor1 = User.objects.create_user('inst1', 'inst1@example.com', 'inst123', role='instructor')
         instructor2 = User.objects.create_user('inst2', 'inst2@example.com', 'inst123', role='instructor')
         student1 = User.objects.create_user('student1', 'student1@example.com', 'student123', role='student')

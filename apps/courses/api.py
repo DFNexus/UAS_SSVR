@@ -95,7 +95,8 @@ def create_course(request, payload: CourseCreateSchema):
         level=payload.level,
         status=payload.status
     )
-    return 201, course
+    from ninja.responses import Status
+    return Status(201, course)
 
 @course_router.put("/{course_id}", response=CourseSchema, auth=InstructorAuth())
 def update_course(request, course_id: int, payload: CourseUpdateSchema):
@@ -142,7 +143,8 @@ def create_section(request, course_id: int, payload: SectionCreateSchema):
         title=payload.title,
         order=payload.order
     )
-    return 201, section
+    from ninja.responses import Status
+    return Status(201, section)
 
 @section_router.put("/{section_id}", response=SectionSchema, auth=InstructorAuth())
 def update_section(request, section_id: int, payload: SectionCreateSchema):
@@ -175,7 +177,8 @@ def create_lesson(request, section_id: int, payload: LessonCreateSchema):
         section=section,
         **payload.dict()
     )
-    return 201, lesson
+    from ninja.responses import Status
+    return Status(201, lesson)
 
 @lesson_router.put("/{lesson_id}", response=LessonSchema, auth=InstructorAuth())
 def update_lesson(request, lesson_id: int, payload: LessonCreateSchema):

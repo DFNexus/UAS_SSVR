@@ -1,4 +1,4 @@
-from .base import *
+from .base import *  # noqa: F403
 
 # Override DATABASES to use SQLite in-memory for very fast testing
 DATABASES = {

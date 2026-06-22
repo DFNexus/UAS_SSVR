@@ -1,5 +1,5 @@
 from ninja import ModelSchema, Schema
-from typing import List
+from typing import Dict
 
 from apps.courses.schemas import LessonSchema
 from .models import Progress
@@ -11,7 +11,6 @@ class ProgressSchema(ModelSchema):
         model = Progress
         fields = ['id', 'completed', 'completed_at']
 
-from typing import Dict
 
 class ProgressDetailSchema(Schema):
     lesson_progress: Dict[int, bool]

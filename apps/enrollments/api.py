@@ -21,7 +21,8 @@ def create_enrollment(request, payload: EnrollmentCreateSchema):
         student=request.user,
         course=course
     )
-    return 201, enrollment
+    from ninja.responses import Status
+    return Status(201, enrollment)
 
 @router.get("/enrollments/me", response=List[EnrollmentSchema], auth=StudentAuth())
 def my_enrollments(request):

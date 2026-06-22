@@ -1,5 +1,6 @@
 from ninja_jwt.authentication import JWTAuth
 from ninja.errors import HttpError
+from django.contrib.auth.models import AnonymousUser
 
 class BaseAuth(JWTAuth):
     """
@@ -29,7 +30,6 @@ class StudentAuth(JWTAuth):
             raise HttpError(403, "Student permission required.")
         return user
 
-from django.contrib.auth.models import AnonymousUser
 
 class OptionalJWTAuth(JWTAuth):
     def __call__(self, request):

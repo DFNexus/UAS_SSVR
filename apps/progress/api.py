@@ -1,6 +1,5 @@
 from ninja import Router
 from django.shortcuts import get_object_or_404
-from ninja.errors import HttpError
 from django.utils import timezone
 
 from .models import Progress
@@ -30,7 +29,8 @@ def complete_lesson(request, lesson_id: int):
         progress.completed_at = timezone.now()
         progress.save()
         
-    return 200, progress
+    from ninja.responses import Status
+    return Status(200, progress)
 
 @router.get("/courses/{course_id}/progress", response=ProgressDetailSchema, auth=StudentAuth())
 def get_course_progress(request, course_id: int):
