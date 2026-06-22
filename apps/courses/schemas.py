@@ -45,6 +45,8 @@ class CourseSchema(ModelSchema):
 
 class CourseDetailSchema(CourseSchema):
     sections: List[SectionSchema] = []
+    average_rating: Optional[float] = 0.0
+    total_reviews: Optional[int] = 0
 
 class CourseCreateSchema(Schema):
     title: str

@@ -71,4 +71,13 @@ class Command(BaseCommand):
             completed_at=timezone.now()
         )
 
+        # Reviews
+        from apps.reviews.models import Review
+        Review.objects.create(student=student1, course=course1, rating=5, body='Great course!')
+        Review.objects.create(student=student2, course=course1, rating=4, body='Very informative.')
+
+        # Wishlist
+        from apps.wishlist.models import Wishlist
+        Wishlist.objects.create(student=student3, course=course1)
+
         self.stdout.write(self.style.SUCCESS('Successfully seeded demo data!'))

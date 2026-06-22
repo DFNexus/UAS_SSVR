@@ -3,7 +3,7 @@ from typing import List
 from django.shortcuts import get_object_or_404
 from ninja.errors import HttpError
 from django.utils.text import slugify
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Avg
 
 from .models import Course, Section, Lesson
 from apps.categories.models import Category
@@ -72,7 +72,13 @@ def list_courses(request, filters: CourseFilterSchema = Query(...)):
 
 @course_router.get("/{course_id}", response=CourseDetailSchema)
 def get_course_detail(request, course_id: int):
-    course = get_object_or_404(Course, id=course_id)
+    course = get_object_or_404(
+        Course.objects.annotate(
+            average_rating=Avg('reviews__rating'),
+            total_reviews=Count('reviews', distinct=True)
+        ), 
+        id=course_id
+    )
     return course
 
 @course_router.post("/", response={201: CourseSchema}, auth=InstructorAuth())

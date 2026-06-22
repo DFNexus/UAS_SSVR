@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'apps.courses',
     'apps.enrollments',
     'apps.progress',
+    'apps.reviews',
+    'apps.wishlist',
     'seed',
 ]
 
