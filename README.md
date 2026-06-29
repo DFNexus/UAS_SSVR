@@ -24,6 +24,25 @@ Sistem ini didesain sepenuhnya menggunakan arsitektur containerized. Anda hanya 
 
 *(Tidak perlu menginstal Python atau PostgreSQL secara manual di komputer Anda).*
 
+### Diagram Arsitektur Sistem
+
+```mermaid
+graph TD
+    Client[Web Browser / Postman] -->|HTTP 8080/8000| Nginx[Nginx Proxy / Frontend]
+    Nginx -->|Proxy Pass| Web(Django Ninja API)
+    
+    subgraph Docker Infrastructure
+        Web -->|Port 5432| DB[(PostgreSQL)]
+        Web -->|Port 6379| Cache[(Redis)]
+    end
+    
+    subgraph Core Apps
+        Web -.-> Auth[users]
+        Web -.-> Course[courses & categories]
+        Web -.-> Student[enrollments & progress]
+        Web -.-> Inter[reviews & wishlist]
+    end
+```
 ---
 
 ## Instalasi dan Cara Menjalankan

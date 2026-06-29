@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple LMS Frontend</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #ddd; }
+        .hidden { display: none; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background-color: #0056b3; }
+        .card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+        #auth-status { font-weight: bold; color: green; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Simple LMS</h1>
+    <p id="auth-status">Not logged in.</p>
+
+    <!-- Login Section -->
+    <div id="login-section" class="section">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username (e.g. student2)" value="student2">
+        <input type="password" id="password" placeholder="Password" value="student123">
+        <button onclick="login()">Login</button>
+        <p id="login-error" style="color: red;"></p>
+    </div>
+
+    <!-- Authenticated Sections -->
+    <div id="app-section" class="hidden">
+        <button onclick="logout()" style="background-color: #dc3545;">Logout</button>
+        
+        <div class="section">
+            <h2>Student Dashboard</h2>
+            <button onclick="fetchDashboard()">Load Dashboard</button>
+            <div id="dashboard-content"></div>
+        </div>
+
+        <div class="section">
+            <h2>All Courses</h2>
+            <button onclick="fetchCourses()">Load Courses</button>
+            <div id="courses-content"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let token = localStorage.getItem('lms_token');
+
+    if (token) {
+        showApp();
+    }
+
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const err = document.getElementById('login-error');
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                token = data.access;
+                localStorage.setItem('lms_token', token);
+                err.innerText = '';
+                showApp();
+            } else {
+                err.innerText = data.detail || 'Login failed';
+            }
+        } catch (e) {
+            err.innerText = 'Network error';
+        }
+    }
+
+    function logout() {
+        token = null;
+        localStorage.removeItem('lms_token');
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('app-section').classList.add('hidden');
+        document.getElementById('auth-status').innerText = 'Not logged in.';
+        document.getElementById('dashboard-content').innerHTML = '';
+        document.getElementById('courses-content').innerHTML = '';
+    }
+
+    function showApp() {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('app-section').classList.remove('hidden');
+        document.getElementById('auth-status').innerText = 'Logged in successfully!';
+    }
+
+    async function fetchDashboard() {
+        const res = await fetch('/api/dashboard/student', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const container = document.getElementById('dashboard-content');
+        if (res.ok) {
+            container.innerHTML = `
+                <div class="card">
+                    <p><strong>Total Enrolled:</strong> ${data.metrics.total_enrolled}</p>
+                    <p><strong>Total Completed:</strong> ${data.metrics.total_completed}</p>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `<p style="color:red">Failed to load dashboard: ${data.message || 'Unauthorized'}</p>`;
+            if (res.status === 401) logout();
+        }
+    }
+
+    async function fetchCourses() {
+        const res = await fetch('/api/courses/');
+        const data = await res.json();
+        const container = document.getElementById('courses-content');
+        if (res.ok) {
+            let html = '';
+            data.items.forEach(course => {
+                html += `
+                    <div class="card">
+                        <h3>${course.title} <small>(${course.level})</small></h3>
+                        <p>${course.description}</p>
+                        <p><strong>Instructor:</strong> ${course.instructor_name}</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = `<p style="color:red">Failed to load courses</p>`;
+        }
+    }
+</script>
+
+</body>
+</html>
