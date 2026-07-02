@@ -99,19 +99,18 @@ Aplikasi kini berjalan dan dapat diakses di:
 
 ---
 
-## Akun Demo Terdaftar
+## Membuat Akun Pengguna
 
-Setelah Anda menjalankan perintah seeding di atas, Anda dapat masuk (login) menggunakan akun berikut:
+Setelah aplikasi berjalan, Anda perlu membuat akun terlebih dahulu untuk bisa mengakses fitur-fitur API. Gunakan perintah berikut melalui Django Admin CLI:
 
-| Role | Username | Password | Deskripsi / Fungsi Utama |
-|:---|:---|:---|:---|
-| **Admin** | `admin` | `admin123` | Akses ke seluruh endpoint tanpa batasan, manajemen kategori. |
-| **Instructor** | `instructor1` | `instructor123` | Bisa membuat, mengubah, menghapus kursusnya sendiri, dan melihat enrollment muridnya. |
-| **Instructor** | `instructor2` | `instructor123` | Sama dengan Instructor 1 (untuk menguji data isolation). |
-| **Student** | `student1` | `student123` | Bisa mendaftar (enroll), progres belajar, review, wishlist, dan melihat dashboard. |
-| **Student** | `student2` | `student123` | Sama dengan Student 1. |
+**Membuat akun Admin (Superuser):**
+```bash
+docker compose exec web python manage.py createsuperuser
+```
 
-*Untuk login, kirim `POST /api/auth/login` dan ambil access token. Di Swagger, klik tombol Authorize, ketik `Bearer ` diikuti dengan spasi dan paste token Anda.*
+Setelah akun admin dibuat, Anda bisa login ke **Django Admin** (`http://localhost:8000/admin/`) untuk membuat akun Instructor dan Student secara manual melalui antarmuka web.
+
+*Untuk login via API, kirim `POST /api/auth/login` dengan body JSON berisi `username` dan `password`, lalu ambil nilai `access` token dari respons. Di Swagger, klik tombol Authorize, ketik `Bearer ` diikuti spasi dan paste token Anda.*
 
 ---
 
