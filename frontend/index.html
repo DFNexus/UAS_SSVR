@@ -1,127 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple LMS Frontend</title>
     <style>
-        body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1, h2 { color: #333; }
-        .section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #ddd; }
-        .hidden { display: none; }
-        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-        button { background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
-        button:hover { background-color: #0056b3; }
-        .card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
-        #auth-status { font-weight: bold; color: green; }
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        #auth-status {
+            font-weight: bold;
+            color: green;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>Simple LMS</h1>
-    <p id="auth-status">Not logged in.</p>
+    <div class="container">
+        <h1>Simple LMS</h1>
+        <p id="auth-status">Not logged in.</p>
 
-    <!-- Login Section -->
-    <div id="login-section" class="section">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username (e.g. student2)" value="student2">
-        <input type="password" id="password" placeholder="Password" value="student123">
-        <button onclick="login()">Login</button>
-        <p id="login-error" style="color: red;"></p>
-    </div>
-
-    <!-- Authenticated Sections -->
-    <div id="app-section" class="hidden">
-        <button onclick="logout()" style="background-color: #dc3545;">Logout</button>
-        
-        <div class="section">
-            <h2>Student Dashboard</h2>
-            <button onclick="fetchDashboard()">Load Dashboard</button>
-            <div id="dashboard-content"></div>
+        <!-- Login Section -->
+        <div id="login-section" class="section">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username (e.g. student2)" value="student2">
+            <input type="password" id="password" placeholder="Password" value="student123">
+            <button onclick="login()">Login</button>
+            <p id="login-error" style="color: red;"></p>
         </div>
 
-        <div class="section">
-            <h2>All Courses</h2>
-            <button onclick="fetchCourses()">Load Courses</button>
-            <div id="courses-content"></div>
+        <!-- Authenticated Sections -->
+        <div id="app-section" class="hidden">
+            <button onclick="logout()" style="background-color: #dc3545;">Logout</button>
+
+            <div class="section">
+                <h2>Student Dashboard</h2>
+                <button onclick="fetchDashboard()">Load Dashboard</button>
+                <div id="dashboard-content"></div>
+            </div>
+
+            <div class="section">
+                <h2>All Courses</h2>
+                <button onclick="fetchCourses()">Load Courses</button>
+                <div id="courses-content"></div>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    let token = localStorage.getItem('lms_token');
+    <script>
+        let token = localStorage.getItem('lms_token');
 
-    if (token) {
-        showApp();
-    }
-
-    async function login() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const err = document.getElementById('login-error');
-
-        try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                token = data.access;
-                localStorage.setItem('lms_token', token);
-                err.innerText = '';
-                showApp();
-            } else {
-                err.innerText = data.detail || 'Login failed';
-            }
-        } catch (e) {
-            err.innerText = 'Network error';
+        if (token) {
+            showApp();
         }
-    }
 
-    function logout() {
-        token = null;
-        localStorage.removeItem('lms_token');
-        document.getElementById('login-section').classList.remove('hidden');
-        document.getElementById('app-section').classList.add('hidden');
-        document.getElementById('auth-status').innerText = 'Not logged in.';
-        document.getElementById('dashboard-content').innerHTML = '';
-        document.getElementById('courses-content').innerHTML = '';
-    }
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const err = document.getElementById('login-error');
 
-    function showApp() {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('app-section').classList.remove('hidden');
-        document.getElementById('auth-status').innerText = 'Logged in successfully!';
-    }
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
 
-    async function fetchDashboard() {
-        try {
-            const res = await fetch('/api/dashboard/student', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            const container = document.getElementById('dashboard-content');
-            if (res.ok) {
-                let activeHtml = '';
-                if (data.course_active && data.course_active.length > 0) {
-                    data.course_active.forEach(item => {
-                        activeHtml += `<div class="card"><strong>${item.course.title}</strong> - Progress: ${item.progress_percentage.toFixed(1)}%</div>`;
-                    });
+                if (res.ok) {
+                    token = data.access;
+                    localStorage.setItem('lms_token', token);
+                    err.innerText = '';
+                    showApp();
                 } else {
-                    activeHtml = '<p>Belum ada kursus aktif.</p>';
+                    err.innerText = data.detail || 'Login failed';
                 }
-                let completedHtml = '';
-                if (data.course_completed && data.course_completed.length > 0) {
-                    data.course_completed.forEach(c => {
-                        completedHtml += `<div class="card"><strong>${c.title}</strong> (Selesai)</div>`;
-                    });
-                }
-                container.innerHTML = `
+            } catch (e) {
+                err.innerText = 'Network error';
+            }
+        }
+
+        function logout() {
+            token = null;
+            localStorage.removeItem('lms_token');
+            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('app-section').classList.add('hidden');
+            document.getElementById('auth-status').innerText = 'Not logged in.';
+            document.getElementById('dashboard-content').innerHTML = '';
+            document.getElementById('courses-content').innerHTML = '';
+        }
+
+        function showApp() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
+            document.getElementById('auth-status').innerText = 'Logged in successfully!';
+        }
+
+        async function fetchDashboard() {
+            try {
+                const res = await fetch('/api/dashboard/student', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const container = document.getElementById('dashboard-content');
+                if (res.ok) {
+                    let activeHtml = '';
+                    if (data.course_active && data.course_active.length > 0) {
+                        data.course_active.forEach(item => {
+                            activeHtml += `<div class="card"><strong>${item.course.title}</strong> - Progress: ${item.progress_percentage.toFixed(1)}%</div>`;
+                        });
+                    } else {
+                        activeHtml = '<p>Belum ada kursus aktif.</p>';
+                    }
+                    let completedHtml = '';
+                    if (data.course_completed && data.course_completed.length > 0) {
+                        data.course_completed.forEach(c => {
+                            completedHtml += `<div class="card"><strong>${c.title}</strong> (Selesai)</div>`;
+                        });
+                    }
+                    container.innerHTML = `
                     <div class="card">
                         <p><strong>Total Enrolled:</strong> ${data.total_enrolled}</p>
                         <p><strong>Total Completed:</strong> ${data.total_completed}</p>
@@ -130,45 +184,46 @@
                     ${activeHtml}
                     ${completedHtml ? '<h3>Kursus Selesai</h3>' + completedHtml : ''}
                 `;
-            } else {
-                container.innerHTML = `<p style="color:red">Failed to load dashboard: ${data.detail || data.message || 'Unauthorized'}</p>`;
-                if (res.status === 401) logout();
-            }
-        } catch (e) {
-            document.getElementById('dashboard-content').innerHTML = `<p style="color:red">Network error: ${e.message}</p>`;
-        }
-    }
-
-    async function fetchCourses() {
-        try {
-            const res = await fetch('/api/courses/');
-            const data = await res.json();
-            const container = document.getElementById('courses-content');
-            if (res.ok) {
-                const courses = Array.isArray(data) ? data : (data.items || []);
-                if (courses.length === 0) {
-                    container.innerHTML = '<p>Belum ada kursus tersedia.</p>';
-                    return;
+                } else {
+                    container.innerHTML = `<p style="color:red">Failed to load dashboard: ${data.detail || data.message || 'Unauthorized'}</p>`;
+                    if (res.status === 401) logout();
                 }
-                let html = '';
-                courses.forEach(course => {
-                    html += `
+            } catch (e) {
+                document.getElementById('dashboard-content').innerHTML = `<p style="color:red">Network error: ${e.message}</p>`;
+            }
+        }
+
+        async function fetchCourses() {
+            try {
+                const res = await fetch('/api/courses/');
+                const data = await res.json();
+                const container = document.getElementById('courses-content');
+                if (res.ok) {
+                    const courses = Array.isArray(data) ? data : (data.items || []);
+                    if (courses.length === 0) {
+                        container.innerHTML = '<p>Belum ada kursus tersedia.</p>';
+                        return;
+                    }
+                    let html = '';
+                    courses.forEach(course => {
+                        html += `
                         <div class="card">
                             <h3>${course.title} <small>(${course.level || ''})</small></h3>
                             <p>${course.description || ''}</p>
                             <p><strong>Instructor:</strong> ${course.instructor ? course.instructor.username : 'N/A'}</p>
                         </div>
                     `;
-                });
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = `<p style="color:red">Failed to load courses: ${data.detail || ''}</p>`;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<p style="color:red">Failed to load courses: ${data.detail || ''}</p>`;
+                }
+            } catch (e) {
+                document.getElementById('courses-content').innerHTML = `<p style="color:red">Network error: ${e.message}</p>`;
             }
-        } catch (e) {
-            document.getElementById('courses-content').innerHTML = `<p style="color:red">Network error: ${e.message}</p>`;
         }
-    }
-</script>
+    </script>
 
 </body>
+
 </html>
