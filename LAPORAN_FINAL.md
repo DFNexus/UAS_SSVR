@@ -11,7 +11,7 @@ Proyek **Simple LMS API** dikembangkan sebagai fondasi sistem manajemen pembelaj
 
 ---
 
-## 2. Tumpukan Teknologi (Tech Stack)
+## 2. Tech Stack
 
 Aplikasi ini dibangun di atas tumpukan teknologi modern yang kuat dan mudah diperluas (*scalable*):
 - **Web Framework**: **Django 5.2** bertindak sebagai fondasi utama sistem ORM (*Object-Relational Mapping*) dan penyedia struktur *backend*.
@@ -22,7 +22,7 @@ Aplikasi ini dibangun di atas tumpukan teknologi modern yang kuat dan mudah dipe
 
 ---
 
-## 3. Keputusan Desain dan Praktik Terbaik (Best Practices)
+## 3. Keputusan Desain
 
 Untuk memastikan skalabilitas, keamanan, dan kemudahan pemeliharaan kode (*maintainability*), proyek ini menerapkan berbagai pola desain perangkat lunak (*design patterns*) tingkat lanjut:
 
