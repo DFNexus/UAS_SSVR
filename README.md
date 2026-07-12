@@ -149,7 +149,7 @@ docker compose exec web pytest
 
 ## Pengujian Manual via Postman
 
-Terdapat file Postman Collection di dalam folder `postman/` (`UAS-SSVR-Collection.json`).
+Terdapat dua file Postman Collection di dalam folder `postman/` (`UAS-SSVR-Collection-Student.json` dan `UAS-SSVR-Collection-Instructor.json`).
 - Impor file JSON tersebut ke aplikasi Postman.
 - File tersebut sudah mencakup environment variables (seperti `{{base_url}}`).
 - Anda bisa langsung mencoba endpoint dengan token yang dapat diatur via tab Variables di level Collection.
